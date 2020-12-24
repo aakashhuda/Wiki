@@ -27,8 +27,9 @@ def search(request):
         s_result = []
         m = Markdown()
         q = request.POST["q"]
+        q_lower = q.lower()
         entries = util.list_entries()
-        pattern = re.compile(q)
+        pattern = re.compile(q_lower)
         for entry in entries:
             if q.lower()==entry.lower():
                 f = util.get_entry(entry)
@@ -38,7 +39,7 @@ def search(request):
                     "title":entry,
                 })
             else:
-                match = pattern.search(entry)
+                match = pattern.search(entry.lower())
                 if match is None:
                     continue
                 else:
