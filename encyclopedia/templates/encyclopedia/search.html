@@ -6,7 +6,7 @@
 {% block body %}
     <ul>
         {% for result in s_result %}
-            <a href="{% url 'get' result %}"><li>{{result}}</li></a>
+            <a href="{% url 'encyclopedia:get' result %}"><li>{{result}}</li></a>
         {% empty %}
             <h1>No entries found</h1>
         {% endfor %}
