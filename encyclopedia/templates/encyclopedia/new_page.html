@@ -1,0 +1,27 @@
+{% extends "encyclopedia/layout.html" %}
+{% block title %}
+    New Entry
+{% endblock %}
+
+{% block body %}
+    <h1>New Entry</h1>
+    <div class="bg-light w-75 p-5 border border-info rounded-lg">
+      <form action="{% url 'encyclopedia:add_entry' %}" method="POST">
+          {% csrf_token %}
+          {{ form.non_field_errors }}
+          <div class="mb-3">
+              
+              <label for="form.title.id_for_label" class="form-label">Title</label>
+              {{form.title}}
+              {{ form.title.errors }}
+            </div>
+            <div class="mb-3">
+                
+              <label for="form.blog.id_for_label" class="form-label">Blog</label>
+              {{form.blog}}
+              {{form.blog.errors}}
+            </div>
+          <input type="submit" class="btn btn-info w-75" value="Save">
+      </form>
+    </div>
+{% endblock %}
