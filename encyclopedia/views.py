@@ -4,18 +4,21 @@ from django.urls import reverse
 from django.http import HttpResponseRedirect,HttpResponse
 from django import forms
 import re
+import random
 
 from . import util
 
+#Django form for new blog entry.
 class NewEntryForm(forms.Form):
     title = forms.CharField(required=True, label="Enter title ",max_length=20,min_length=1,widget=forms.TextInput(attrs={"placeholder":"Title","class":"form-control w-50 font-italic"}))
     blog = forms.CharField(widget=forms.Textarea(attrs={"placeholder":"Type markdown content here...","class":"form-control w-75"}))
 
-
+#Index page where all the entries are presented
 def index(request):
     return render(request, "encyclopedia/index.html", {
         "entries": util.list_entries()
     })
+#Retrieve a particular file & converts markdown content to html
 def get(request,title):
     m = Markdown()
     f= util.get_entry(title)
@@ -29,6 +32,7 @@ def get(request,title):
         "content":content,
         "title":title
     })
+#Search for a particular file. This search function is case not sensitive.
 def search(request):
     if request.method == 'POST':
         s_result = []
@@ -49,10 +53,17 @@ def search(request):
         return render(request, "encyclopedia/search.html", {
             "s_result":s_result,
         })
+    else:
+        return render(request, "encyclopedia/error.html", {
+            "heading":"Error",
+            "message": "Invalid form submission."
+        })
+# Presents a new empty form for a new entry.
 def new_page(request):
     return render(request, "encyclopedia/new_page.html",{
         "form": NewEntryForm()
     })
+# Adds an entry if it doesn't exist.
 def add_entry(request):
     if request.method =="POST":
         form = NewEntryForm(request.POST)
@@ -74,3 +85,39 @@ def add_entry(request):
             return render(request, "encyclopedia/new_page.html",{
                 "form": form,
             })
+    else:
+        return render(request, "encyclopedia/error.html", {
+            "heading":"Error",
+            "message": "Invalid form submission!"
+        })
+# Opens a random existing entry
+def rand_func(request):
+    entries = util.list_entries()
+    rand_value = random.randint(0,len(entries)-1)
+    title = entries[rand_value]
+    return HttpResponseRedirect(reverse('encyclopedia:get', kwargs={"title":title}))
+# Allows a user to edit an existing entry.
+def edit(request,title):
+    post = util.get_entry(title)
+    if post:
+        return render(request, "encyclopedia/edit_page.html", {
+            "post":post,
+            "title":title,
+        })
+    else:
+        return render(request, "encyclopedia/error.html", {
+            "heading": "Error",
+            "message": "Invalid post edit request!"
+        })
+# This function saves a post after editting
+def save_post(request):
+    if request.method == "POST":
+        content = request.POST["edit_post"]
+        title = request.POST["title"]
+        util.save_entry(title, content)
+        return HttpResponseRedirect(reverse('encyclopedia:get', kwargs={"title":title}))
+    else:
+        return render(request, "encyclopedia/error.html", {
+            "heading":"Error",
+            "message": "Invalid post saving request!"
+        })
