@@ -5,7 +5,7 @@
 
 {% block body %}
     <h1>New Entry</h1>
-    <div class="bg-light w-75 p-5 border border-info rounded-lg">
+    <div class="col-12 col-sm-12 col-lg-12 bg-light w-75 p-5 border border-info rounded-lg">
       <form action="{% url 'encyclopedia:add_entry' %}" method="POST">
           {% csrf_token %}
           {{ form.non_field_errors }}
